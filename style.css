@@ -1,0 +1,200 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+body {
+    line-height: 1.6em;
+    font-size: 20px;
+}
+
+.font-sans {
+    font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.bg-blue-dark {
+    --tw-bg-opacity: 1;
+    background-color: #0c142e;
+}
+
+/* eliminare stili di default link */
+a {
+    text-decoration: none;
+    color: currentColor;
+}
+
+/* eliminare stili di default lista */
+.list-none {
+    list-style: none;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.wrap {
+    flex-wrap: wrap;
+}
+.px-20 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+.px-40 {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+
+.py-20 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.py-40 {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+}
+
+.p-20 {
+    padding: 1.25rem;
+}
+
+.p-160 {
+    padding: 10rem;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.justify-end {
+    justify-content: end;
+}
+
+.justify-evenly {
+    justify-content: space-evenly;
+}
+
+.justify-around {
+    justify-content: space-around;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.text-white {
+    --tw-text-opacity: 1;
+    color: #ffffff;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-thin {
+    font-weight: 100;
+}
+
+.text-3xl {
+    font-size: 1.8rem;
+    line-height: 2.25rem;
+}
+
+.hover\:text-green-400:hover {
+    --tw-text-opacity: 1;
+    color: #56e98c;
+}
+
+
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.underline {
+    text-decoration-line: underline;
+}
+
+.decoration-transparent {
+    text-decoration-color: transparent;
+}
+
+.duration-200 {
+    transition-duration: 200ms;
+}
+
+.duration-400 {
+    transition-duration: 400ms;
+}
+
+.hover\:decoration-green-300:hover {
+    text-decoration-color: #86efac;
+}
+
+.git-hub-mark-svg {
+    cursor: pointer;
+    transform: scale(0.4);
+    width: 100px;
+    height: 100px;
+}
+
+.fill-white {
+    fill: #fff;
+}
+
+.hover\:fill-green-400:hover {
+    fill: #56e98c;
+}
+
+.ease-in {
+    transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+.w-10 {
+    width: 2.5rem
+        /* 40px */
+    ;
+}
+
+.hover\:cursor-pointer:hover {
+    cursor: pointer;
+}
+
+.card {
+    cursor: pointer;
+    width: 200px;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    background-color: #15234e;
+    color: #ffff;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card-content {
+    padding: 25px 25px;
+    font-size: 1em;
+}
+
+.card-title {
+    font-size: 1.2em;
+    padding: 0px 0 15px;
+}
+
+.m-16 {
+    margin: 1rem;
+}
