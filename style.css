@@ -41,10 +41,12 @@ a {
 .wrap {
     flex-wrap: wrap;
 }
+
 .px-20 {
     padding-left: 1rem;
     padding-right: 1rem;
 }
+
 .px-40 {
     padding-left: 2.5rem;
     padding-right: 2.5rem;
@@ -64,8 +66,8 @@ a {
     padding: 1.25rem;
 }
 
-.p-160 {
-    padding: 10rem;
+.py-160 {
+    padding: 10rem 0;
 }
 
 .justify-between {
@@ -105,14 +107,59 @@ a {
     font-weight: 100;
 }
 
+.text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
 .text-3xl {
     font-size: 1.8rem;
     line-height: 2.25rem;
 }
 
-.hover\:text-green-400:hover {
+.text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+.text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.text-hotpink {
     --tw-text-opacity: 1;
-    color: #56e98c;
+    color: hotpink;
+}
+
+.hover\:text-hotpink:hover {
+    --tw-text-opacity: 1;
+    color: hotpink;
 }
 
 
@@ -138,13 +185,30 @@ a {
     transition-duration: 400ms;
 }
 
-.hover\:decoration-green-300:hover {
-    text-decoration-color: #86efac;
+.hover\:decoration-hotpink:hover {
+    text-decoration-color: hotpink;
+}
+.github-link {
+    height: 45px;
+}
+.github-text {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+}
+
+.github-link:hover .github-text {
+    opacity: 1;
+    transform: translateX(0);
+    background-color: hotpink;
+    border-radius: 1.25rem;
+    padding: 5px 10px;
+
 }
 
 .git-hub-mark-svg {
     cursor: pointer;
-    transform: scale(0.4);
+    transform: scale(0.3);
     width: 100px;
     height: 100px;
 }
@@ -153,8 +217,8 @@ a {
     fill: #fff;
 }
 
-.hover\:fill-green-400:hover {
-    fill: #56e98c;
+.hover\:fill-hotpink:hover {
+    fill: hotpink;
 }
 
 .ease-in {
@@ -171,9 +235,11 @@ a {
     cursor: pointer;
 }
 
+.index-card {
+    width: 100%;
+}
+
 .card {
-    cursor: pointer;
-    width: 200px;
     border-radius: 10px;
     overflow: hidden;
     transition: all 0.2s ease;
@@ -181,20 +247,65 @@ a {
     color: #ffff;
 }
 
-.card:hover {
-    transform: scale(1.05);
-}
 
 .card-content {
     padding: 25px 25px;
     font-size: 1em;
 }
 
-.card-title {
-    font-size: 1.2em;
-    padding: 0px 0 15px;
+.card-paragraph {
+    padding-top: 1em;
+    /* 16px */
 }
 
 .m-16 {
     margin: 1rem;
 }
+
+/* Underline styles - Slide in */
+.card-title {
+
+    display: block;
+    position: relative;
+    padding: 0 0 0.25em;
+}
+
+/* Fade in */
+.card-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 15%;
+    height: 0.1em;
+    background-color: hotpink;
+    opacity: 0;
+    transition: opacity 300ms, transform 300ms;
+}
+
+/* Slide in */
+.card-title {
+    overflow: hidden;
+}
+
+.card-title::after {
+    opacity: 1;
+    transform: translate3d(-100%, 0, 0);
+}
+
+.card-title:hover::after,
+.card-titlefocus::after {
+    transform: translate3d(0, 0, 0);
+}
+
+/* Scale from center */
+/* li:nth-child(3) a::after {
+    opacity: 1;
+    transform: scale(0);
+    transform-origin: center;
+}
+
+li:nth-child(3) a:hover::after,
+li:nth-child(3) a:focus::after {
+    transform: scale(1);
+} */
