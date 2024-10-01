@@ -46,16 +46,16 @@ function draw() {
   fill("white");
   strokeWeight(2);
   stroke("black");
+  let w_house = 70;
+  let h_house = 70;
   let x_house = 0;
-  let y_house = 140;
-  let w_house = 60;
-  let h_house = 60;
+  let y_house = ysize/2-h_house;
   rect(x_house, y_house, w_house, h_house);
   // tetto
   fill("red");
   triangle(x_house, y_house, x_house + w_house, y_house, x_house + (w_house) / 2, y_house / 2);
-  for (let n_case = 0; n_case < 5; n_case++) {
-    x_house = x_house + w_house * 1.8;
+  for (let n_case = 0; n_case < 3; n_case++) {
+    x_house = x_house + w_house * 1.5;
     fill("red");
     triangle(x_house, y_house, x_house + w_house, y_house, x_house + (w_house) / 2, y_house / 2);
     fill("white");
