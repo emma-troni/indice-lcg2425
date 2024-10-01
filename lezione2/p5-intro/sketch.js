@@ -25,7 +25,7 @@ function draw() {
   fill("white");
   stroke(0);
   strokeWeight(2);
-  textSize(30);
+  textSize(20);
   text("C'era una volta...", 10,30);
 }
 
