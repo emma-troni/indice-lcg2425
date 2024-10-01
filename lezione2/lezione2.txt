@@ -1,0 +1,12 @@
+p5.js
+
+How to make the most basic p5 sketch? Creare una tavola/canvas, e poi continua ad eseguire la funzione corpo della draw() fino a che qualcuno forza l'uscita o errore.
+
+    function setup() {
+    createCanvas(400, 400);
+    }
+    function draw() {
+    background(220);
+    }
+
+per salvarli online - log in;

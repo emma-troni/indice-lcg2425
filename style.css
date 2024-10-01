@@ -226,9 +226,7 @@ a {
 }
 
 .w-10 {
-    width: 2.5rem
-        /* 40px */
-    ;
+    width: 2.5rem;
 }
 
 .hover\:cursor-pointer:hover {
@@ -245,7 +243,11 @@ a {
     transition: all 0.2s ease;
     background-color: #15234e;
     color: #ffff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
+.card:hover {
+    transform: scale(1.015);
+  }
 
 
 .card-content {
