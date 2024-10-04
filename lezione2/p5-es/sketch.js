@@ -49,7 +49,7 @@ function draw() {
   let w_house = 70;
   let h_house = 70;
   let x_house = 0;
-  let y_house = ysize/2-h_house;
+  let y_house = ysize / 2 - h_house;
   rect(x_house, y_house, w_house, h_house);
   // tetto
   fill("red");
@@ -61,5 +61,4 @@ function draw() {
     fill("white");
     rect(x_house, y_house, w_house, h_house);
   }
-
 }
