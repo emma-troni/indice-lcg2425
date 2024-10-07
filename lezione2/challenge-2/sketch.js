@@ -6,10 +6,39 @@ function setup() {
 }
 
 function draw() {
-  // cielo == sfondo
+  // CIELO == sfondo
   background(107, 140, 255);
 
-  // tubo
+  // NUVOLE
+  let xCloud = 200;
+  let yCloud = 100;
+  let sizeCloud = 40;
+  strokeWeight(0);
+  fill("white");
+  // 1a riga
+  for (x = xCloud * 0.2; x < xsize; x += sizeCloud * 4) {
+    // centrale
+    ellipse(x, yCloud, sizeCloud, sizeCloud * 0.6);
+    // laterali
+    ellipse(x - sizeCloud * 0.4, yCloud, sizeCloud * 0.6, sizeCloud * 0.6);
+    ellipse(x + sizeCloud * 0.4, yCloud, sizeCloud * 0.6, sizeCloud * 0.6);
+    // superiori
+    ellipse(x + sizeCloud * 0.2, yCloud - sizeCloud * 0.3, sizeCloud * 0.5, sizeCloud * 0.5);
+    ellipse(x - sizeCloud * 0.2, yCloud - sizeCloud * 0.3, sizeCloud * 0.5, sizeCloud * 0.5);
+  }
+  // 2a riga
+  for (y = -40; y < ysize; y += sizeCloud * 4) {
+    // centrale
+    ellipse(y, yCloud * 0.5, sizeCloud, sizeCloud * 0.6);
+    // laterale
+    ellipse(y - sizeCloud * 0.4, yCloud * 0.5, sizeCloud * 0.6, sizeCloud * 0.6);
+    // superiori
+    ellipse(y + sizeCloud * 0.2, yCloud * 0.5 - sizeCloud * 0.3, sizeCloud * 0.5, sizeCloud * 0.5);
+    ellipse(y - sizeCloud * 0.2, yCloud * 0.5 - sizeCloud * 0.3, sizeCloud * 0.5, sizeCloud * 0.5);
+  }
+
+
+  // TUBI
   fill("#13C642");
   stroke("black");
   strokeWeight(2);
@@ -29,7 +58,7 @@ function draw() {
     rect(x, yPipe, wPipe, hPipe);
   }
 
-  // pavimento
+  // PAVIMENTO
   fill(139, 69, 19);
   groundSize = 50;
   // rect(0, ysize - groundSize, groundSize,groundSize);
@@ -41,13 +70,9 @@ function draw() {
 
   // GOOMBA
   stroke("black")
-  let xGoomba = 100;
+  // let xGoomba = 100;
   let yGoomba = 310
-
   let sizeGoomba = 55;
-
-
-
   for (x = 80; x < xsize; x += 80) {
     // testa
     fill(150, 75, 0);
@@ -72,37 +97,6 @@ function draw() {
     ellipse(x - sizeGoomba * 0.25, yGoomba + sizeGoomba * 0.7, sizeGoomba * 0.45, sizeGoomba * 0.25)
     ellipse(x + sizeGoomba * 0.25, yGoomba + sizeGoomba * 0.7, sizeGoomba * 0.45, sizeGoomba * 0.25)
   }
-  // nuvola
-  let xCloud = 200;
-  let yCloud = 100;
-  let sizeCloud = 40;
-  strokeWeight(0);
-  fill("white");
-
-  for (x = xCloud * 0.2; x < xsize; x += sizeCloud * 4) {
-    // centrale
-    ellipse(x, yCloud, sizeCloud, sizeCloud * 0.6);
-    // laterali
-    ellipse(x - sizeCloud * 0.4, yCloud, sizeCloud * 0.6, sizeCloud * 0.6);
-    ellipse(x + sizeCloud * 0.4, yCloud, sizeCloud * 0.6, sizeCloud * 0.6);
-    // superiori
-    ellipse(x + sizeCloud * 0.2, yCloud - sizeCloud * 0.3, sizeCloud * 0.5, sizeCloud * 0.5);
-    ellipse(x - sizeCloud * 0.2, yCloud - sizeCloud * 0.3, sizeCloud * 0.5, sizeCloud * 0.5);
-
-  }
-
-  for (y = -40; y < ysize; y += sizeCloud * 4) {
-    // centrale
-    ellipse(y, yCloud * 0.5, sizeCloud, sizeCloud * 0.6);
-    // laterale
-    ellipse(y - sizeCloud * 0.4, yCloud * 0.5, sizeCloud * 0.6, sizeCloud * 0.6);
-    // superiori
-    ellipse(y + sizeCloud * 0.2, yCloud * 0.5 - sizeCloud * 0.3, sizeCloud * 0.5, sizeCloud * 0.5);
-    ellipse(y - sizeCloud * 0.2, yCloud * 0.5 - sizeCloud * 0.3, sizeCloud * 0.5, sizeCloud * 0.5);
-  }
-
-
-
 
 
 
