@@ -71,7 +71,7 @@ function draw() {
   // GOOMBA
   stroke("black")
   // let xGoomba = 100;
-  let yGoomba = 310
+  let yGoomba = ysize-90;
   let sizeGoomba = 55;
   for (x = 80; x < xsize; x += 80) {
     // testa
