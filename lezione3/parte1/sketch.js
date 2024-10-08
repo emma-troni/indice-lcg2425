@@ -14,6 +14,7 @@ function draw() {
   // in modo da aggiungere ogni volta che disegno 
   // per fare in modo che non si sovrappongano le scritte
   // concatenare delle variabili es. mauseX con un pezzo di testo
+  
   // textSize(20);
   // strokeWeight(0);
   // let FirstString = "Mouse x = " + mouseX + ";";
