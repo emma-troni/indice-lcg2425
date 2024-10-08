@@ -1,8 +1,13 @@
 let canvasXMax = 400, canvasYMax = 400;
 let moonXpos = 255;
 let moonYpos = 50;
+let slider;
 function setup() {
   createCanvas(canvasXMax, canvasYMax);
+  slider = createSlider(0,255,0,1);
+  // createSlider( minimo, massimo, default, step );
+  slider.position(0,canvasYMax-60);
+  slider.size(200);
 }
 
 // OBIETTIVO 
@@ -10,7 +15,7 @@ function setup() {
 //    variabile che definisce la coordinata x della luna si aggiorni 
 
 function draw() {
-  background("hotpink");
+  background("blue");
 
   // FRAME RATE
   //   --> con quale frequenza si aggiorna il nostro disegno
@@ -69,6 +74,7 @@ function draw() {
   strokeWeight(1);//outline thickness
   let x_casa = 0;
   let house_height = 100, house_width = 100;
+  
   for (let numero_case = 0; numero_case < 3; numero_case++) {
     fill("white");
     rect(x_casa, y - house_height, house_width, house_height);
@@ -80,7 +86,26 @@ function draw() {
 
 
   //  ROLLOVER --> agiamo se passimo sopra
-  
+  // if (passiamo sopra) {facciamo cose}
+  // siamo dentro le x della casa?
+  // mouseX > x_casa
+  // mouseX < x_casa + house_width
+  // siamo dentro le y della cosa?
+  // mouseY > left_corner
+  // mouseY < left_corner + house_whidth
+
+  // AND --------> && ---> entrambe true
+  // OR  --------> || ---> almeno una sia vera
+
+  // NB la variabile x_casa è stata cambiata nel ciclo for:
+  x_casa = 0
+
+  let left_Corner = y - house_height;
+  let sliderValue = slider.value()
+  if ((mouseX > x_casa) && (mouseX < x_casa+house_width) && (mouseY > left_Corner) && (mouseY < left_Corner + house_width)){
+    fill(sliderValue);
+    rect(x_casa, y - house_height, house_width, house_height);
+  } 
 
 
   // RANDOM STARS
@@ -112,5 +137,5 @@ function draw() {
   strokeWeight(1);
   fill(255);//white text
   textSize(20);
-  text(`Frame-Count = ${frameCount}`, 5, 380);
+  text(`Frame-Count = ${frameCount}  Value= ${sliderValue}`, 5, 380);
 }
