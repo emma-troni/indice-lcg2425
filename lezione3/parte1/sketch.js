@@ -1,5 +1,5 @@
-let canvasXMax = 600;
-let canvasYMax = 600;
+let canvasXMax = 1900;
+let canvasYMax = 1900;
 
 function setup() {
   createCanvas(canvasXMax, canvasYMax);
