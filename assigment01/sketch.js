@@ -20,34 +20,53 @@ function draw() {
 
   // gap = wRect;
   // rect(100,100,wRect,hRect);
+
   let indexRow = 1;
+  let indexCol = 0;
   for (let y = yMargin; y < windowHeight - yMargin; y += hRect) {
-    // Determina il colore in base alla riga
     if (indexRow % 2 == 0) {
-      fill("black"); // Righe pari nere
-    } else {
-      fill("#c1c1c1"); // Righe dispari color sfondo
+      fill("black"); 
+    } else if ((indexRow % 2 != 0) ){
+      noFill();
     }
-    // Disegna i rettangoli in una riga
+    
     for (let x = xMargin; x < windowWidth - xMargin; x += wRect) {
       rect(x, y, wRect, hRect);
     }
-    indexRow++; // Incrementa il contatore delle righe
+    indexRow++; 
+    indexCol++
   }
 
-  let indexCol = 1;
-  for (let x = xMargin; x < windowWidth - xMargin; x += wRect)  {
+  for (let x = xMargin; x < windowWidth - xMargin-wRect; x += wRect)  {
+    for (let y = yMargin; y < windowHeight - yMargin; y += hRect) {
+      
+      if((indexCol%2==0)) {
+        fill("#c1c1c1");
+      } else if ((indexCol%2!=0)){
+        noFill();
+      } 
+      rect(x, y, wRect, hRect);
+    }
+    indexCol++;
+  }
+
+
+  for (let x = xMargin; x < windowWidth - xMargin-2*wRect; x += wRect)  {
     for (let y = yMargin; y < windowHeight - yMargin; y += hRect) {
       
       if((indexCol%2==0)) {
         fill(random(50, 200), random(50, 170), random(50, 200));
-      } else {
+      } else if (indexCol%2!=0){
         noFill();
-      }
+      } 
       rect(x, y, wRect, hRect);
     }
-    indexCol++
+    indexCol++;
   }
+
+
+
+  
 
 
 }
