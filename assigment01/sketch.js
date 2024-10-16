@@ -21,8 +21,9 @@ function draw() {
   // gap = wRect;
   // rect(100,100,wRect,hRect);
 
-  let indexRow = 1;
+  let indexRow = 0;
   let indexCol = 0;
+
   for (let y = yMargin; y < windowHeight - yMargin; y += hRect) {
     for (let x = xMargin; x < windowWidth - xMargin; x += wRect) {
     if (indexRow % 2 == 0) {
@@ -40,20 +41,6 @@ function draw() {
     for (let y = yMargin; y < windowHeight - yMargin; y += hRect) {
       
       if((indexCol%2==0)) {
-        fill("#c1c1c1");
-      } else if ((indexCol%2!=0)){
-        noFill();
-      } 
-      rect(x, y, wRect, hRect);
-    }
-    indexCol++;
-  }
-
-
-  for (let x = xMargin; x < windowWidth - xMargin-2*wRect; x += wRect)  {
-    for (let y = yMargin; y < windowHeight - yMargin; y += hRect) {
-      
-      if((indexCol%2==0)) {
         fill(random(50, 200), random(50, 170), random(50, 200));
       } else if (indexCol%2!=0){
         noFill();
@@ -62,10 +49,20 @@ function draw() {
     }
     indexCol++;
   }
+}
 
-
-
-  
-
-
+function rowDraw(){
+  for (let y = yMargin; y < windowHeight - yMargin; y += hRect) {
+    for (let x = xMargin; x < windowWidth - xMargin; x += wRect) {
+      for (let indexRow=1; indexRow<rowCount; indexRow++) {
+        if (indexRow%2==0){
+          fill("black");
+        } else {
+          noFill();
+        }
+      }
+      rect(x, y, wRect, hRect);
+    }
+    
+  }
 }
