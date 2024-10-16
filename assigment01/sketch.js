@@ -16,7 +16,7 @@ function draw() {
   let hRect = (windowHeight - (12.24/100) * windowHeight * 2)/ rowCount;
   let xMargin = (10.31 / 100) * windowWidth;
   let yMargin = (12.24 / 100) * windowHeight;
-  
+  noStroke();
 
   // gap = wRect;
   // rect(100,100,wRect,hRect);
@@ -24,13 +24,12 @@ function draw() {
   let indexRow = 1;
   let indexCol = 0;
   for (let y = yMargin; y < windowHeight - yMargin; y += hRect) {
+    for (let x = xMargin; x < windowWidth - xMargin; x += wRect) {
     if (indexRow % 2 == 0) {
       fill("black"); 
     } else if ((indexRow % 2 != 0) ){
       noFill();
     }
-    
-    for (let x = xMargin; x < windowWidth - xMargin; x += wRect) {
       rect(x, y, wRect, hRect);
     }
     indexRow++; 
