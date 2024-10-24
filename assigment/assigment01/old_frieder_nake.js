@@ -14,7 +14,7 @@ function draw() {
     noStroke();
 
     let count = 14; // N Righe == N colonne
-
+    
     // misurazioni dall'opera originale
     let testContentSize = 880;
     let testMarginSize = 260;

@@ -1,4 +1,4 @@
-// REFERENCE: https://www.tate.org.uk/art/artworks/nake-no-title-p80809
+// REFERENCE ARTWORK: https://www.tate.org.uk/art/artworks/nake-no-title-p80809
 // No Title - 1967, Frieder Nake
 
 function setup() {
@@ -11,17 +11,22 @@ function setup() {
 
 function draw() {
     background("#e8e6e4");
-    // misure originali
-    let testContentSize = 880;
-    let testMarginSize = 260;
-    let testStrokeSize = 9;
+    let unitCount = 14; // N Righe == N colonne
+    
+    // Il contenuto in cui sono stati disegnati gli elementi quadrati è composto da una griglia 14x14 di elementi quadrati della stessa dimensione. 
+    // Tale struttura la si può notare ripetuta uguale anche nelle opere parte della stessa collezione. Il singolo elemento quadrato della griglia è stato poi modificato randomicamente per: dimensione, orientamento e colore. 
+
+    // misurazioni dall'opera originale
+    let measuredContent = 880; 
+    let measuredMargin = 260;
+    let measuredStroke = 9;
+
+    // il calcolo dell'aspect ratio mi permette di ottenere delle proporzioni indipendenti dai pixel, proporzioni che devono mantenersi rispettate per far si che il contenuto sia responsive
 
     // marginContentRatio = quante volte sta il margine nel content
-    let marginContentRatio = testMarginSize / testContentSize;
+    let marginContentRatio = measuredMargin / measuredContent;
     // (contentSize * strokeToContentRatio) = strokeWeight
-    let strokeToContentRatio = testStrokeSize / testContentSize;
-
-    let unitCount = 14; // N Righe == N colonne
+    let strokeToContentRatio = measuredStroke / measuredContent;
 
     // margine = (contentSize * marginContentRatio) 
     // min(windowWidth, windowHeight) = (contentSize) + (margine * 2)
@@ -32,7 +37,7 @@ function draw() {
     let contentX = (windowWidth - contentSize) / 2;
     let contentY = (windowHeight - contentSize) / 2;
 
-    // faccio si che il margine vari in base alla dimensione del contenuto in modo che sia responsive
+    // faccio si che il margine vari in base alla dimensione del contenuto in modo che il contenuto sia responsive
     let strokeSize = contentSize * strokeToContentRatio;
     strokeWeight(strokeSize);
 
@@ -61,7 +66,7 @@ function draw() {
                         stroke(orange);
                     } else if (choice < 0.963) {
                         stroke(yellow);
-                    } else {
+                    } else if (choice < 0.963) {
                         stroke(gray);
                     }
                 } else {
@@ -90,7 +95,7 @@ function isSquare(col, row) {
     // row > col + q
 
     if (row >= col + 6) {
-        // Salta la parte dopo e continua il ciclo.
+        // salta la parte dopo e continua il ciclo.
         return false;
     }
 
@@ -99,7 +104,7 @@ function isSquare(col, row) {
     }
 
     if (row >= -col + 6 && row < -col + 22) {
-        // Fascio di rette parallele pari:
+        // fascio di rette parallele pari:
         // row = col + q dove q deve essere pari
         if ((row - col) % 2 == 0) {
             return false;
@@ -112,32 +117,34 @@ function isSquare(col, row) {
 function drawSquare(col, row, unitSize, unitCount) {
     let centerUnitX = col * unitSize + unitSize / 2;
     let centerUnitY = row * unitSize + unitSize / 2;
-
-    // Lo square è più piccolo della unità
-    let squareSize = random(unitSize * 0.6, unitSize * 0.95);
-
     push();
 
     translate(centerUnitX, centerUnitY);
-    // max e min valore di x e y nel contenuto
-    let contentMinX = 0 - centerUnitX;
-    let contentMinY = 0 - centerUnitY;
-
-    let contentMaxX = unitCount * unitSize - centerUnitX;
-    let contentMaxY = unitCount * unitSize - centerUnitY;
-
-    let a = -squareSize / 2;
-    let b = a + squareSize;
-
-    let angle = random(0, 90);
-
-    let points = [[a, a], [a, b], [b, b], [b, a]];
-
     // [a, a] ----> [a, b]
     // ^                 |
     // |      (0, 0)     |
     // |                 v
     // [b, a] <---- [b, b]
+
+    // min valore di x e y del contenuto visibile dell'opera 
+    let contentMinX = 0 - centerUnitX;
+    let contentMinY = 0 - centerUnitY;
+    // max valore di x e y del contenuto visibile dell'opera 
+    let contentMaxX = unitCount * unitSize - centerUnitX;
+    let contentMaxY = unitCount * unitSize - centerUnitY;
+
+    // la dimensione massima è più piccola della unità
+    let squareSize = random(unitSize * 0.6, unitSize * 0.95); 
+    // coordinate dei punti del singolo quadratino 
+    let a = -squareSize / 2;
+    let b = a + squareSize;
+    // angolo di rotazione di ciascun quadratino
+    let angle = random(0, 90);
+
+    // lista dei punti che compone i vertici di ogni quadratino
+    let points = [[a, a], [a, b], [b, b], [b, a]];
+
+    // costruzione del quadratino
     for (let i = 0; i < points.length; i++) {
         let startVettore = points[i];
 
@@ -148,9 +155,10 @@ function drawSquare(col, row, unitSize, unitCount) {
             endVettore = points[i + 1];
         }
 
-        // line(startVettore[0], startVettore[1], endVettore[0], endVettore[1]);
-
+        // nell'opera originale il disegno del quadrato si interrompe quando il tratto arriva al margine del contenuto disegnato. 
+        // Per poter ottenere lo stesso risultato, è necessario applicare una trasformazione ai vettori che costruiscono il sistema di riferimento, che al momento ha orignine nel centro della singola unità (enterUnitX, centerUnitY).
         // https://en.wikipedia.org/wiki/Rotation_matrix#In_two_dimensions
+        // Questa trasformazione permette di ruotare tale sistema rispetto all'anglolo di rotazione generato randomicamente, applicato al singolo elemento. In questo modo è possibile valutare se il segmento che compone il quadrato esce dal margine contenuto visibile, e trovare il punto appartenente a tale retta che interseca il margine stesso dell'opera.
 
         // coordinate iniziali vettore ruotato (x1, y1)
         let x1 = startVettore[0] * cos(angle) - startVettore[1] * sin(angle);
@@ -159,10 +167,10 @@ function drawSquare(col, row, unitSize, unitCount) {
         let x2 = endVettore[0] * cos(angle) - endVettore[1] * sin(angle);
         let y2 = endVettore[0] * sin(angle) + endVettore[1] * cos(angle);
 
-        // retta per 2 punti:
+        // considero l'espressione della retta passante per 2 punti per poter trovare il punto di intersezione alla retta che interseca il margine dell'opera:
         // (x - x1) / (x2 - x1) = (y - y1) / (y2 - y1)
 
-        // Se x1 è fuori dal margine sinistro trovo un punto sulla retta x1y1 x2y2 che sia sul margine
+        // se x1 è fuori dal margine sinistro trovo un punto sulla retta x1y1 x2y2 che sia sul margine
         if (x1 < contentMinX) {
             let x = contentMinX;
             let y = (x - x1) / (x2 - x1) * (y2 - y1) + y1;
@@ -170,7 +178,7 @@ function drawSquare(col, row, unitSize, unitCount) {
             y1 = y
         }
 
-        // Se x2 è fuori dal margine sinistro trovo un punto sulla retta x1y1 x2y2 che sia sul margine
+        // se x2 è fuori dal margine sinistro trovo un punto sulla retta x1y1 x2y2 che sia sul margine
         if (x2 < contentMinX) {
             let x = contentMinX;
             let y = (x - x1) / (x2 - x1) * (y2 - y1) + y1;
@@ -178,7 +186,7 @@ function drawSquare(col, row, unitSize, unitCount) {
             y2 = y
         }
 
-        // Se y1 è fuori dal margine superiore trovo un punto sulla retta x1y1 x2y2 che sia sul margine
+        // se y1 è fuori dal margine superiore trovo un punto sulla retta x1y1 x2y2 che sia sul margine
         if (y1 < contentMinY) {
             let y = contentMinY;
             let x = (y - y1) / (y2 - y1) * (x2 - x1) + x1;
@@ -186,7 +194,7 @@ function drawSquare(col, row, unitSize, unitCount) {
             y1 = y
         }
 
-        // Se y2 è fuori dal margine superiore trovo un punto sulla retta x1y1 x2y2 che sia sul margine
+        // se y2 è fuori dal margine superiore trovo un punto sulla retta x1y1 x2y2 che sia sul margine
         if (y2 < contentMinY) {
             let y = contentMinY;
             let x = (y - y1) / (y2 - y1) * (x2 - x1) + x1;
@@ -194,7 +202,7 @@ function drawSquare(col, row, unitSize, unitCount) {
             y2 = y
         }
 
-        // Se x1 è fuori dal margine destro trovo un punto sulla retta x1y1 x2y2 che sia sul margine
+        // se x1 è fuori dal margine destro trovo un punto sulla retta x1y1 x2y2 che sia sul margine
         if (x1 > contentMaxX) {
             let x = contentMaxX;
             let y = (x - x1) / (x2 - x1) * (y2 - y1) + y1;
@@ -202,7 +210,7 @@ function drawSquare(col, row, unitSize, unitCount) {
             y1 = y
         }
 
-        // Se x2 è fuori dal margine destro trovo un punto sulla retta x1y1 x2y2 che sia sul margine
+        // se x2 è fuori dal margine destro trovo un punto sulla retta x1y1 x2y2 che sia sul margine
         if (x2 > contentMaxX) {
             let x = contentMaxX;
             let y = (x - x1) / (x2 - x1) * (y2 - y1) + y1;
@@ -210,7 +218,7 @@ function drawSquare(col, row, unitSize, unitCount) {
             y2 = y
         }
 
-        // Se y1 è fuori dal margine inferiore trovo un punto sulla retta x1y1 x2y2 che sia sul margine
+        // se y1 è fuori dal margine inferiore trovo un punto sulla retta x1y1 x2y2 che sia sul margine
         if (y1 > contentMaxY) {
             let y = contentMaxY;
             let x = (y - y1) / (y2 - y1) * (x2 - x1) + x1;
@@ -218,7 +226,7 @@ function drawSquare(col, row, unitSize, unitCount) {
             y1 = y
         }
 
-        // Se y2 è fuori dal margine inferiore trovo un punto sulla retta x1y1 x2y2 che sia sul margine
+        // se y2 è fuori dal margine inferiore trovo un punto sulla retta x1y1 x2y2 che sia sul margine
         if (y2 > contentMaxY) {
             let y = contentMaxY;
             let x = (y - y1) / (y2 - y1) * (x2 - x1) + x1;
@@ -233,32 +241,4 @@ function drawSquare(col, row, unitSize, unitCount) {
     pop();
 }
 
-function isOutMarginX(x1, y1, x2, y2, centerUnit, contentMinX) {
-    if (x1 < -centerUnit) {
-        let x = 0 - centerUnit;
-        let y = (x - x1) / (x2 - x1) * (y2 - y1) + y1;
-        x1 = x
-        y1 = y
-    }
-    else if (x2 < contentMinX) {
-        let x = contentMinX;
-        let y = (x - x1) / (x2 - x1) * (y2 - y1) + y1;
-        x2 = x
-        y2 = y
-    }
-}
-function isOutMarginY(x1, y1, x2, y2, contentMaxY) {
-    if (y1 > contentMaxY) {
-        let y = contentMaxY;
-        let x = (y - y1) / (y2 - y1) * (x2 - x1) + x1;
-        x1 = x
-        y1 = y
-    }
-    if (y2 > contentMaxY) {
-        let y = contentMaxY;
-        let x = (y - y1) / (y2 - y1) * (x2 - x1) + x1;
-        x2 = x
-        y2 = y
-    }
-}
 
