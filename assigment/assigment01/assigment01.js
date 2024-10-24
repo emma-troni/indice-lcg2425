@@ -1,6 +1,11 @@
-// REFERENCE ARTWORK: https://www.tate.org.uk/art/artworks/nake-no-title-p80809
+// REFERENCE: https://www.tate.org.uk/art/artworks/nake-no-title-p80809
 // No Title - 1967, Frieder Nake
-
+// funzione che permette ridimensionamento del canvas quando la finestra viene ridimensionata.
+function windowResized() { 
+    resizeCanvas(windowWidth, windowHeight);
+    redraw(); 
+    //Ridisegna il canvas dopo sul ridimensionamento.
+  }
 function setup() {
     createCanvas(windowWidth, windowHeight);
     noLoop();
@@ -14,7 +19,8 @@ function draw() {
     let unitCount = 14; // N Righe == N colonne
     
     // Il contenuto in cui sono stati disegnati gli elementi quadrati è composto da una griglia 14x14 di elementi quadrati della stessa dimensione. 
-    // Tale struttura la si può notare ripetuta uguale anche nelle opere parte della stessa collezione. Il singolo elemento quadrato della griglia è stato poi modificato randomicamente per: dimensione, orientamento e colore. 
+    // Tale struttura la si può notare ripetuta uguale anche nelle opere parte della stessa collezione. 
+    // Il singolo elemento quadrato della griglia è stato poi modificato randomicamente per: dimensione, orientamento e colore. 
 
     // misurazioni dall'opera originale
     let measuredContent = 880; 
@@ -37,7 +43,7 @@ function draw() {
     let contentX = (windowWidth - contentSize) / 2;
     let contentY = (windowHeight - contentSize) / 2;
 
-    // faccio si che il margine vari in base alla dimensione del contenuto in modo che il contenuto sia responsive
+    // faccio si che il margine vari in base alla dimensione del contenuto in modo che il contenutosia responsive
     let strokeSize = contentSize * strokeToContentRatio;
     strokeWeight(strokeSize);
 
@@ -66,7 +72,7 @@ function draw() {
                         stroke(orange);
                     } else if (choice < 0.963) {
                         stroke(yellow);
-                    } else if (choice < 0.963) {
+                    } else {
                         stroke(gray);
                     }
                 } else {
@@ -158,7 +164,8 @@ function drawSquare(col, row, unitSize, unitCount) {
         // nell'opera originale il disegno del quadrato si interrompe quando il tratto arriva al margine del contenuto disegnato. 
         // Per poter ottenere lo stesso risultato, è necessario applicare una trasformazione ai vettori che costruiscono il sistema di riferimento, che al momento ha orignine nel centro della singola unità (enterUnitX, centerUnitY).
         // https://en.wikipedia.org/wiki/Rotation_matrix#In_two_dimensions
-        // Questa trasformazione permette di ruotare tale sistema rispetto all'anglolo di rotazione generato randomicamente, applicato al singolo elemento. In questo modo è possibile valutare se il segmento che compone il quadrato esce dal margine contenuto visibile, e trovare il punto appartenente a tale retta che interseca il margine stesso dell'opera.
+        // Questa trasformazione permette di ruotare tale sistema rispetto all'anglolo di rotazione generato randomicamente, applicato al singolo elemento. 
+        // In questo modo è possibile valutare se il segmento che compone il quadrato esce dal margine contenuto visibile, e trovare il punto appartenente a tale retta che interseca il margine stesso dell'opera.
 
         // coordinate iniziali vettore ruotato (x1, y1)
         let x1 = startVettore[0] * cos(angle) - startVettore[1] * sin(angle);
@@ -167,7 +174,8 @@ function drawSquare(col, row, unitSize, unitCount) {
         let x2 = endVettore[0] * cos(angle) - endVettore[1] * sin(angle);
         let y2 = endVettore[0] * sin(angle) + endVettore[1] * cos(angle);
 
-        // considero l'espressione della retta passante per 2 punti per poter trovare il punto di intersezione alla retta che interseca il margine dell'opera:
+        // considero l'espressione della retta passante per 2 punti 
+        // per poter trovare il punto di intersezione alla retta che interseca il margine dell'opera:
         // (x - x1) / (x2 - x1) = (y - y1) / (y2 - y1)
 
         // se x1 è fuori dal margine sinistro trovo un punto sulla retta x1y1 x2y2 che sia sul margine
@@ -240,5 +248,4 @@ function drawSquare(col, row, unitSize, unitCount) {
     }
     pop();
 }
-
 
