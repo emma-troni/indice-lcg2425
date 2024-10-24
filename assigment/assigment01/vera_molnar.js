@@ -13,8 +13,7 @@ function draw() {
     background("white");
     noStroke();
     
-    fill("yellow")
-    rect(windowWidth / 2, windowHeight / 2, windowWidth / 2, windowHeight / 2)
+    
     fill("green")
     rect(0, windowHeight / 2, windowWidth / 2, windowHeight / 2)
     // primo quadrante:
@@ -28,10 +27,19 @@ function draw() {
     }
     let secondLineSize = 27;
     let secondDistance = 18;
-    for (let x = windowWidth / 2 + distance; x < windowWidth; x +=secondDistance) {
+    let factor = 27/13.5;
+    
+    for (let x = windowWidth / 2 + distance; x < windowWidth; x +=distance) {
         for (let y = 0; y < windowHeight / 2; y += distance) {
             stroke("red")
             drawSmallRect(x, y, secondLineSize);
+        }
+    }
+    let thirdLineSize = factor*13.5*2
+    for (let x = windowWidth / 2 + distance; x < windowWidth; x +=distance) {
+        for (let y = windowHeight / 2; y < windowHeight; y += distance) {
+            stroke("red")
+            drawSmallRect(x, y, thirdLineSize);
         }
     }
 }

@@ -15,11 +15,15 @@ function draw() {
 
     let count = 14; // N Righe == N colonne
 
-    // misure opera originale
+    // misurazioni dall'opera originale
     let testContentSize = 880;
     let testMarginSize = 260;
     let testStrokeSize = 9;
+
     // per ottenere le proporzioni indipendenti dal num di px
+    // aspect ratio mi permette di ottenere delle proporzioni indipendenti dai pixel
+    // che devono mantenersi rispettate
+
     // calcolo l'aspect ratio (larghezza / altezza):
     let marginContentRatio = testMarginSize / testContentSize;
     let strokeToContentRatio = testStrokeSize / testContentSize;
@@ -31,15 +35,14 @@ function draw() {
     let marginX = (windowWidth - contentSize) / 2;
     let marginY = (windowHeight - contentSize) / 2;
 
+
     push();
-    // rectMode(CENTER);
     // calcolo le coordinate del centro della prima riga e colonna e imposto lì l'origine del disegno
     let centerX = marginX + unitSize / 2;
     let centerY = marginY + unitSize / 2;
     translate(centerX, centerY);
 
-
-    //  aggiungo l'opoacità direttamente nel codice colore
+    //  aggiungo l'opacità direttamente nel codice colore
     let red = color(216, 81, 40, 180);
     let orange = color(217, 125, 19, 190);
 
@@ -57,16 +60,16 @@ function draw() {
             if (isSquare(col, row)) {
                 // in centro alla figura
                 if (row >= -col + 6 && row < -col + 21) {
+                    let choice = random(0,1);
                     // N rossi (23/54 -> 42.6%) 
                     // N arancioni (17/54 -> 31.5%) 
                     //  N gialli (12/54 -> 22.2%) 
                     //  N grigi (2/54 -> 3.7%)
-                    let choice = random();
                     if (choice < 0.426) {
                         stroke(red);
-                    } else if (choice < (0.741)) {
+                    } else if (choice < (0.426 + 0.315)) {
                         stroke(orange);
-                    } else if (choice < 0.963) {
+                    } else if (choice <(0.426 + 0.315 + 0.222)) {
                         stroke(yellow);
                     } else {
                         stroke(gray);
@@ -75,22 +78,20 @@ function draw() {
                     // nei due vertici (in alto dx e in basso sx)
                     // N rossi (15/30 -> 50%)
                     // N arancio (13/30 ->43.3%)
-                    //  N giallin (2/30 -> 6.7%)
+                    //  N gialli (2/30 -> 6.7%)
                     let choice = random();
                     if (choice < 0.50) {
                         stroke(red);
-                    } else if (choice < (0.433 + 0.5)) {
+                    } else if (choice < (0.5 + 0.433)) {
                         stroke(orange);
                     } else {
                         stroke(yellow);
                     }
                 }
-                // drawSquare(col, row, unitSize);
-                drawSquare(col, row, unitSize, contentSize, marginX, marginY)
+                drawSquare(col, row, unitSize);
             }
         }
     }
-
     pop();
 
     // margini:
@@ -128,73 +129,32 @@ function isSquare(col, row) {
 }
 
 // semplice con rect
-// function drawSquare(col, row, unitSize) {
-//     // calcolo in che posizione sono (i-esima colonna, j-esima riga) 
-//     let unitX = col * unitSize;
-//     let unitY = row * unitSize;
-//     // dimensione randomica dei quadrati
-//     let squareSize = random(unitSize * 0.8, unitSize * 0.9);
-//     // curvatura angolo del 5% rispetto alla dimensione
-//     let radius = squareSize * 0.05;
+function drawSquare(col, row, unitSize) {
+    // calcolo in che posizione sono (i-esima colonna, j-esima riga) posizionr dell'elem rispetto alla unitsize
 
-//     push();
-
-//     //traslo il centro degli oggetti  
-//     translate(unitX, unitY);
-//     let angle = random(0, 360);
-//     rotate(angle);
-
-//     rect(0, 0, squareSize, squareSize, radius);
-//     // punto visibile - vertice in alto/dx
-//     point(squareSize / 2, squareSize / 2);
-
-//     pop();
-// }
-
-function drawSquare(col, row, unitSize, contentSize, marginX, marginY) {
-    push();
-  
-    // vertice in alto a sinistra dell'unita
+    // componente y dell'unità della griglia di contentSize
     let unitX = col * unitSize;
+    // componente y dell'unità della griglia di contentSize
     let unitY = row * unitSize;
-    
+    // dimensione randomica dei quadrati
     let squareSize = random(unitSize * 0.8, unitSize * 0.9);
-    // let squareSize = unitSize;
-    let unitCenter = unitSize / 2;
-  
-    //traslo rispetto alla posizione della griglia
+    // curvatura angolo del 5% rispetto alla dimensione
+    let radius = squareSize * 0.05;
+
+    push();
+
+    //traslo il centro degli oggetti  
     translate(unitX, unitY);
     let angle = random(0, 360);
     rotate(angle);
-    translate(-unitCenter, -unitCenter);
-    
-    
-    let halfSize = squareSize / 2;
-    let a = unitCenter - halfSize;
-    let b = a + squareSize;
-    
-    let points = [[a, a], [a, b], [b, b], [b, a]];
-    for (let i = 0; i < points.length; i++) {
-      let start = points[i];
-      let end = points[i == points.length - 1 ? 0 : i + 1];
-      
-      line(start[0], start[1], end[0], end[1]);
-    }
-    // for (let i = 0; i < points.length; i++) {
-    //     let start = points[i];
-    //     let end = points[i == points.length - 1 ? 0 : i + 1];
-        
-    //     if (isInsideMargins(start[0], start[1]) && 
-    //         isInsideMargins(end[0], end[1])) {
-    //       line(start[0], start[1], end[0], end[1]);
-    //     }
-    //   }
-    pop();
-  }
 
-  function isInsideMargins(x, y) {
-    if ((x>marginX+contentSize && x<marginX)|(y<marginY && y>marginY+contentSize)){
-    }
-  }
+    rect(0, 0, squareSize, squareSize, radius);
+    // punto visibile - vertice in alto/dx
+    point(squareSize / 2, squareSize / 2);
+
+    pop();
+}
+
+
 
 
