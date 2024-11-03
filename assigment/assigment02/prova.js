@@ -8,7 +8,6 @@
 let colors = [];
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    angleMode(DEGREES);
     noLoop();
     colors = [
         'red', 'blue', 'orange'
@@ -18,7 +17,7 @@ function setup() {
 function draw() {
     background("white");
 
-    // calcolo il fattore di scala in base alla dimensione attuale della finestra rispetto alla dimensione massima
+    // fattore di scala in base alla dimensione attuale della finestra rispetto alla dimensione massima
     let maxWindowWidth = 1920;
     let scaleFactor = windowWidth / maxWindowWidth;
     // dimensinoe della cella rispetto al fattore di scala
@@ -64,7 +63,7 @@ function draw() {
             push()
             translate(x, y)
             strokeWeight(1);
-            // rect(0, 0, cellSize, cellSize);
+            rect(0, 0, cellSize, cellSize);
             drawMap(cellSize)
             pop()
 
@@ -77,21 +76,22 @@ function drawMap(cellSize) {
     strokeWeight(1);
     let subCellSize = cellSize / 10;
     let points = [];
-    for (let x = 0; x < 10; x++) {
+    for (let c = 0; c < 10; c++) {
         let colPoints = [];
-        for (let y = 0; y < 10; y++) {
+        for (let r = 0; r < 10; r++) {
             colPoints.push(false);
-            // let subX = y * subCellSize;
-            // let subY = x * subCellSize;
+            // let subX = r * subCellSize;
+            // let subY = c * subCellSize;
         }
         points.push(colPoints);
     }
     console.log(points);
+ 
     for (let i = 0; i < colors.length; i++) {
-        stroke(colors[i]);
+        stroke(colors[i]);   
         let linePoints = [
             [floor(random(0, 10)) * subCellSize, floor(random(0, 10)) * subCellSize],
-            [floor(random(4, 6)) * subCellSize, floor(random(4, 6)) * subCellSize],
+            [floor(random(3, 6)) * subCellSize, floor(random(3, 6)) * subCellSize],
             [floor(random(0, 10)) * subCellSize, floor(random(0, 10)) * subCellSize]
         ];
         for (let j = 0; j < linePoints.length - 1; j++) {
@@ -101,6 +101,9 @@ function drawMap(cellSize) {
 }
 
 
+// voglio gestire la griglia di punti points per tenere traccia dei punti su cui sono già passata
+// points[x qualsiasi][y qualsiasi]=true
+// if (points[x qualsiasi][y qualsiasi]) { solo se visitato }
 
 
 // https://p5js.org/reference/p5/resizeCanvas/ 
