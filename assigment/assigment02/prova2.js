@@ -1,16 +1,13 @@
 // ASSIGMENT 02 | Algorithmic Gliph generation
-// REFERENCE --> mappe metropolitane: https://www.minniemuse.com/articles/musings/the-subway-map 
 // Per ogni glifo:
 // - linee che hanno un angolo variabile tra 0/45/90° --> creo una sottogriglia per ogni mappa 
-//   per far si che le linee spezzate delle metro passino per i vertici di tale griglia
 // - maggiore probabilità di passaggio verso il centro --> Prossimo punto + vicino passando per il centro
 // - per ogni linea almeno due punti esterni e un punto vicino al centro
 
-
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    angleMode(DEGREES);
     frameRate(0.5);
+    noLoop();
 }
 
 function draw() {
@@ -24,29 +21,26 @@ function draw() {
     // dim contenuto
     let contentWidth = windowWidth - margin * 2;
     let contentHeight = windowHeight - margin * 2;
-    
+
     // n max di colonne/righe si adatta in base allo spazio disponibile
     let nColumns = floor(contentWidth / unitSize);
     let nRows = floor(contentHeight / unitSize);
-    
+
     // dim effettive della griglia
     let gridWidth = nColumns * unitSize;
     let gridHeight = nRows * unitSize;
 
     // centrare la griglia all'interno della finestra
-    let contentX = (windowWidth - gridWidth) / 2;
-    let contentY = (windowHeight - gridHeight) / 2;
-    translate(contentX, contentY)
+    translate((windowWidth - gridWidth) / 2, (windowHeight - gridHeight) / 2);
 
     // grid
     noFill();
     for (let r = 0; r < nRows; r++) {
         for (let c = 0; c < nColumns; c++) {
-            push()
-            translate(c * unitSize + unitSize / 2, r * unitSize  + unitSize / 2)
-            translate(-unitSize / 2, -unitSize / 2)
-            drawMap(unitSize, scaleRatio)
-            pop()
+            push();
+            translate(c * unitSize, r * unitSize);
+            drawMap(unitSize, scaleRatio);
+            pop();
 
         }
     }
@@ -58,11 +52,11 @@ function drawMap(unitSize, scaleRatio) {
     let scaledStroke = 8 * scaleRatio;
     let unitSmallSize = unitSize / gridSize;
     let colors = ["blue", "red", "green", "orange", "hotpink"];
-    let linesCount = floor(random(3, colors.length + 1))
+    let linesCount = floor(random(3, colors.length + 1));
 
-    // voglio gestire la griglia di punti points per tenere traccia dei punti su cui sono già passata
+    // voglio gestire la griglia di punti per tenere traccia dei punti su cui sono già passata
     // points[x qualsiasi][y qualsiasi]=true
-    // la matrice/array points[col][row] verrà impostat a true quando una fermata viene "visitata"
+    // la matrice points[row][col] verrà impostata true quando una fermata viene "visitata"
     let points = [];
     for (let row = 0; row < gridSize; row++) {
         let singlePoint = [];
@@ -77,7 +71,7 @@ function drawMap(unitSize, scaleRatio) {
         stroke(colors[color]);
         // lunghezza linea metro
         let [x, y] = [floor(random(3, 6)), floor(random(3, 6))];
-        let stopsCount = floor(random(5, gridSize * scaleRatio))
+        let stopsCount = floor(random(5, gridSize * scaleRatio));
         // scelgo il numero di iterazioni in base al numero dei colori
         for (let stop = 0; stop < stopsCount; stop++) {
             let nextX, nextY;
@@ -100,15 +94,9 @@ function drawMap(unitSize, scaleRatio) {
                 (points[nextX][nextY] && random() > 0.05)
             );
             strokeWeight(scaledStroke);
-            line(x * unitSmallSize, y * unitSmallSize, nextX * unitSmallSize, nextY * unitSmallSize
-            );
-            // draw stop
-            push()
-            strokeWeight(1)
-            fill("white")
-            circle(x * unitSmallSize, y * unitSmallSize, scaledStroke, scaledStroke)
-            circle(nextX * unitSmallSize, nextY * unitSmallSize, scaledStroke, scaledStroke)
-            pop()
+            line(x * unitSmallSize, y * unitSmallSize, nextX * unitSmallSize, nextY * unitSmallSize);
+            drawStop(x, y, unitSmallSize, scaledStroke);
+            drawStop(nextX, nextY, unitSmallSize, scaledStroke);
             points[x][y] = true;
             points[nextX][nextY] = true;
             x = nextX;
@@ -117,8 +105,11 @@ function drawMap(unitSize, scaleRatio) {
     }
 }
 
-
-
+function drawStop(x, y, unitSmallSize, scaledStroke) {
+    strokeWeight(1);
+    fill("white");
+    circle(x * unitSmallSize, y * unitSmallSize, scaledStroke);
+}
 
 // https://p5js.org/reference/p5/resizeCanvas/ 
 // resizeCanvas() immediately clears the canvas and calls redraw()
