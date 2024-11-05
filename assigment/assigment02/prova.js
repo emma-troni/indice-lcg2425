@@ -1,114 +1,110 @@
-// ASSIGMENT 02 | Algorithmic Gliph generation
-// REFERENCE --> mappe metropolitane: https://www.minniemuse.com/articles/musings/the-subway-map 
-// Per ogni glifo:
-// - linee che hanno un angolo variabile tra 0/45/90° --> creo una sottogriglia per ogni mappa per far si che le linee spezzate delle metro passino per i vertici di tale griglia
-// - maggiore probabilità di passaggio verso il centro --> Prossimo punto + vicino passando per il centro
-// - per ogni linea almeno due punti esterni e un punto vicino al centro
+const colorPalette = [
+    "#fd3f92",
+    "#c90e40",
+    "#9a4eae",
+    "#63b8e1",
+    "#5d7abb",
+    "#2aa95b",
+    "#f3cb15",
+    "#ff7900",
+];
 
-let colors = [];
+// raggio cerchi
+const r = 25;
+// n celle
+const grid = 10;
+
+// CLASS
+// Una classe è un modello (o blueprint) per creare oggetti. Definisce proprietà (variabili) e metodi (funzioni) che un oggetto di quel tipo avrà. In altre parole, una classe ti permette di definire i dati e il comportamento di un oggetto.
+
+// singolo percorso all'interno della griglia, con fermate e linee che collegano le fermate
+class Route {
+    // n casuale di punti interni alla griglia
+    generateRoute(stops, grid) {
+        for (let stop = 0; stop < stops; stop++) {
+            const point = [
+                //  posizione casuale tra (1 , grid - 1), e la moltiplica per l'ampiezza/altezza di una cella
+                int(random(grid - 1) + 1) * int(width / grid),
+                int(random(grid - 1) + 1) * int(height / grid),
+            ];
+            // DON'T ADD DUPLICATE POINTS
+            if (!this.checkPoint(point, this.stations)) {
+                --stop;
+                continue;
+                //  se point è già stato usato per un'altra fermata --> (checkPoint -->  false), 
+                // decrementa (stop) e salta il resto del ciclo for con continue.
+            }
+            this.stations.push(point);
+            // this --> richiama il metodo checkPoint definito all'interno della stessa classe Route
+            //      --> verifica se il punto point esiste già nell'array this.stations.
+        }
+    }
+
+    checkPoint(p, check) {
+        for (let p2 of check) {
+            if (p[0] == p2[0] && p[1] == p2[1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // costruttore serve a inizializzare l'oggetto con delle proprietà specifiche.
+    constructor(stops, grid) {
+        // this.stations significa "le stazioni di questo oggetto specifico di tipo Route"
+        this.stations = [];
+        this.col = color(random(colorPalette));
+
+        this.generateRoute(stops, grid);
+    }
+}
+
 function setup() {
-    createCanvas(windowWidth, windowHeight);
-    noLoop();
-    colors = [
-        'red', 'blue', 'orange'
-    ];
+    createCanvas(720, 720);
+    background(color(255, 241, 208));
+    strokeWeight(10);
+}
+
+function drawSubwayLine(p1, p2) {
+    let midPoint;
+    if (abs(p1[0] - p2[0]) < abs(p1[1] - p2[1])) {
+        const m = p2[1] < p1[1] ? -1 : 1;
+        midPoint = [p2[0], m * abs(p1[0] - p2[0]) + p1[1]];
+    } else {
+        const m = p2[0] < p1[0] ? -1 : 1;
+        midPoint = [m * abs(p2[1] - p1[1]) + p1[0], p2[1]];
+    }
+
+    // Draw lines
+    line(p1[0], p1[1], midPoint[0], midPoint[1]);
+    line(midPoint[0], midPoint[1], p2[0], p2[1]);
+}
+
+function drawStation(p1) {
+    fill(color(255, 241, 208));
+    ellipse(p1[0], p1[1], r, r);
 }
 
 function draw() {
-    background("white");
+    background(color(255, 241, 208));
 
-    // fattore di scala in base alla dimensione attuale della finestra rispetto alla dimensione massima
-    let maxWindowWidth = 1920;
-    let scaleFactor = windowWidth / maxWindowWidth;
-    // dimensinoe della cella rispetto al fattore di scala
-    let maxCellSize = 200;
-    let cellSize = maxCellSize * scaleFactor;
-    // margine proporzionale alla finestra
-    // pvalore massimo del margine = 5% della larghezza della finestra
-    let maxMarginRatio = 0.02;
-    let margin = windowWidth * maxMarginRatio;
+    frameRate(0.5);
+    routes = [];
+    for (let i = 0; i < 3; i++) {
+        routes.push(new Route(int(random(4)) + 2, grid));
+    }
 
-    // calcolo le dimensioni del contenuto in base alla finestra e al margine
-    let contentWidth = windowWidth - margin * 2;
-    let contentHeight = windowHeight - margin * 2;
-
-    // n max di colonne/righe si adatta in base allo spazio disponibile
-    let nColumns = floor(contentWidth / cellSize);
-    let nRows = floor(contentHeight / cellSize);
-
-    // larghezza e altezza effettive della griglia
-    let gridWidth = nColumns * cellSize;
-    let gridHeight = nRows * cellSize;
-
-    // centrare la griglia all'interno della finestra
-    // translate(margin,margin)
-    // calcolo le distanze per 
-    let contentX = (windowWidth - gridWidth) / 2;
-    let contentY = (windowHeight - gridHeight) / 2;
-    translate(contentX, contentY)
-    // ------------ perchè non funziona con margin????
-
-    // disegno il content x testare che sia tutto corretto
-    // fill("pink");
-    // noStroke();
-    // rect(0, 0, gridWidth, gridHeight); 
-
-    // grid
-    noFill();
-    stroke("black");
-    for (let r = 0; r < nRows; r++) {
-        for (let c = 0; c < nColumns; c++) {
-            let x = c * cellSize;
-            let y = r * cellSize;
-            push()
-            translate(x, y)
-            strokeWeight(1);
-            rect(0, 0, cellSize, cellSize);
-            drawMap(cellSize)
-            pop()
-
+    // Draw lines
+    for (let route of routes) {
+        stroke(route.col);
+        for (let i = 0; i < route.stations.length - 1; i++) {
+            drawSubwayLine(route.stations[i], route.stations[i + 1]);
         }
     }
-}
-
-function drawMap(cellSize) {
-    // griglia 10x10 all'interno di ogni cella
-    strokeWeight(1);
-    let subCellSize = cellSize / 10;
-    let points = [];
-    for (let c = 0; c < 10; c++) {
-        let colPoints = [];
-        for (let r = 0; r < 10; r++) {
-            colPoints.push(false);
-            // let subX = r * subCellSize;
-            // let subY = c * subCellSize;
-        }
-        points.push(colPoints);
-    }
-    console.log(points);
- 
-    for (let i = 0; i < colors.length; i++) {
-        stroke(colors[i]);   
-        let linePoints = [
-            [floor(random(0, 10)) * subCellSize, floor(random(0, 10)) * subCellSize],
-            [floor(random(3, 6)) * subCellSize, floor(random(3, 6)) * subCellSize],
-            [floor(random(0, 10)) * subCellSize, floor(random(0, 10)) * subCellSize]
-        ];
-        for (let j = 0; j < linePoints.length - 1; j++) {
-            line(linePoints[j][0], linePoints[j][1], linePoints[j + 1][0], linePoints[j + 1][1]);
+    for (let route of routes) {
+        stroke(route.col);
+        for (let index of route.stations) {
+            drawStation(index);
         }
     }
-}
-
-
-// voglio gestire la griglia di punti points per tenere traccia dei punti su cui sono già passata
-// points[x qualsiasi][y qualsiasi]=true
-// if (points[x qualsiasi][y qualsiasi]) { solo se visitato }
-
-
-// https://p5js.org/reference/p5/resizeCanvas/ 
-// resizeCanvas() immediately clears the canvas and calls redraw()
-function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-    redraw();
 }

@@ -1,38 +1,49 @@
 // ASSIGMENT 02 | Algorithmic Gliph generation
 // Per ogni glifo:
-// - linee che hanno un angolo variabile tra 0/45/90° --> creo una sottogriglia per ogni mappa 
-// - maggiore probabilità di passaggio verso il centro --> Prossimo punto + vicino passando per il centro
-// - per ogni linea almeno due punti esterni e un punto vicino al centro
+//    - linee che hanno un angolo variabile tra 0/45/90° 
+//      --> creo una sottogriglia per ogni mappa 
+//    - maggiore probabilità di passaggio verso il centro 
+//      --> Prossimo punto + vicino passando per il centro
+//    - per ogni linea almeno due punti esterni e un punto vicino al centro
+let colorPalette = [
+  "#fd3f92",
+  "#c90e40",
+  "#9a4eae",
+  "#63b8e1",
+  "#5d7abb",
+  "#2aa95b",
+  "#f3cb15",
+  "#ff7900",
+];
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
     frameRate(0.5);
-    noLoop();
-}
-
-function draw() {
-    background("white");
-    // dim di scalate sulla base di quelle date:
+  }
+  
+  function draw() {
+    background(color(255, 241, 208));
+    // dimensioni scalate sulla base di quelle date:
     let scaleRatio = windowWidth / 1920;
     let maxUnitSize = 200;
     let unitSize = maxUnitSize * scaleRatio;
     // valore massimo del margine = 0.2% della larghezza della finestra
     let margin = windowWidth * 0.02;
-    // dim contenuto
+  
     let contentWidth = windowWidth - margin * 2;
     let contentHeight = windowHeight - margin * 2;
-
+  
     // n max di colonne/righe si adatta in base allo spazio disponibile
     let nColumns = floor(contentWidth / unitSize);
     let nRows = floor(contentHeight / unitSize);
-
+  
     // dim effettive della griglia
     let gridWidth = nColumns * unitSize;
     let gridHeight = nRows * unitSize;
-
+  
     // centrare la griglia all'interno della finestra
     translate((windowWidth - gridWidth) / 2, (windowHeight - gridHeight) / 2);
-
+  
     // grid
     noFill();
     for (let r = 0; r < nRows; r++) {
@@ -41,19 +52,19 @@ function draw() {
             translate(c * unitSize, r * unitSize);
             drawMap(unitSize, scaleRatio);
             pop();
-
+  
         }
     }
-}
-
-function drawMap(unitSize, scaleRatio) {
+  }
+  
+  function drawMap(unitSize, scaleRatio) {
     let gridSize = 10;
     // griglia 10x10 all'interno di ogni unità della griglia + grande
     let scaledStroke = 8 * scaleRatio;
     let unitSmallSize = unitSize / gridSize;
     let colors = ["blue", "red", "green", "orange", "hotpink"];
     let linesCount = floor(random(3, colors.length + 1));
-
+  
     // voglio gestire la griglia di punti per tenere traccia dei punti su cui sono già passata
     // points[x qualsiasi][y qualsiasi]=true
     // la matrice points[row][col] verrà impostata true quando una fermata viene "visitata"
@@ -65,8 +76,8 @@ function drawMap(unitSize, scaleRatio) {
         }
         points.push(singlePoint);
     }
-
-
+  
+  
     for (let color = 0; color < linesCount; color++) {
         stroke(colors[color]);
         // lunghezza linea metro
@@ -77,9 +88,10 @@ function drawMap(unitSize, scaleRatio) {
             let nextX, nextY;
             // CICLO PER DEFINIRE LOGICA DELLE FERMATE 
             // continua a generare punti a caso finché non ne trova uno che rispetta le condizioni:
-            // - nextX non deve uscire dalla griglia a sx/dx
-            // - nextY non deve uscire dalla griglia in alto/basso   
-            // - se la fermata già stata visitata, ha una probablità random<5% fermarsi anche su un punto visitato
+            //    - nextX non deve uscire dalla griglia a sx/dx
+            //    - nextY non deve uscire dalla griglia in alto/basso   
+            //    - se la fermata già stata visitata, ha una probablità 
+            //      random<5% fermarsi anche su un punto visitato
             do {
                 // floor(random (-1,2) --> -1,0,1 --> 8 pti + vicini nella griglia rispetto alla cella/pto precedente
                 // - - -
@@ -87,7 +99,7 @@ function drawMap(unitSize, scaleRatio) {
                 // - - -  
                 nextX = x + floor(random(-1, 2));
                 nextY = y + floor(random(-1, 2));
-
+  
             } while (
                 nextX < 0 || nextX >= gridSize ||
                 nextY < 0 || nextY >= gridSize ||
@@ -103,18 +115,17 @@ function drawMap(unitSize, scaleRatio) {
             y = nextY;
         }
     }
-}
-
-function drawStop(x, y, unitSmallSize, scaledStroke) {
+  }
+  
+  function drawStop(x, y, unitSmallSize, scaledStroke) {
     strokeWeight(1);
     fill("white");
     circle(x * unitSmallSize, y * unitSmallSize, scaledStroke);
-}
-
-// https://p5js.org/reference/p5/resizeCanvas/ 
-// resizeCanvas() immediately clears the canvas and calls redraw()
-function windowResized() {
+  }
+  
+  // https://p5js.org/reference/p5/resizeCanvas/ 
+  // resizeCanvas() immediately clears the canvas and calls redraw()
+  function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
     redraw();
-}
-
+  }
