@@ -28,15 +28,15 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noLoop();
+
   table = riversData.getObject();
   nRivers = riversData.getRowCount();
 
-  // Trovo il min/max per length e min_temp
+  // min max lenght/min_temp:
   minLength = Number(table[0].length);
   maxLength = Number(table[0].length);
   minTemp = Number(table[0].min_temp);
   maxTemp = Number(table[0].min_temp);
-
   for (let i = 1; i < nRivers; i++) {
     let lengthValue = Number(table[i].length);
     if (lengthValue < minLength) {
@@ -59,15 +59,17 @@ function setup() {
 
 function draw() {
   background(bgColor);
-  textSize(20);
   // HEADER
+  textSize(20);
   textAlign(CENTER, TOP);
   push()
   textStyle(BOLD);
   fill(txtColor);
   text("Rivers in the World", width / 2, 30);
   pop()
+
   scaleFactor = min(windowWidth, windowHeight) / 1000;
+
   // CONTINENTI e FIUMI
   let distContinents = min(windowWidth, windowHeight) / distContinentsFactor;
   let positions = continentPos(continents.length, width / 2, height / 2 - height / 20, distContinents);
@@ -78,7 +80,7 @@ function draw() {
     let y = positions[i][1];
     drawContinent(x, y, continent);
   }
-  drawLegend()
+  legenda()
 }
 
 
@@ -106,12 +108,12 @@ function drawContinent(x, y, continent) {
   // DISEGNO FIUMI INTERNI AI CONTINENTI
   drawRivers(x, y, radius, continent);
 
-  // nome del continente sopra il cerchio
+  // NOME del continente sopra il cerchio
   let textOffsetY = radius + paddingContinentName;
   fill(txtColor);
   textSize(14);
   textAlign(CENTER, CENTER);
-  text(continent, x, y - textOffsetY); // Posiziona il testo sopra il cerchio
+  text(continent, x, y - textOffsetY); 
 
 }
 
@@ -157,8 +159,8 @@ function continentSize(continent) {
 // FIUMI
 function drawRivers(centerX, centerY, maxRadius, continent) {
   // counter per i cerchi effettivamente disegnati
-  let successfullyPlacedCircles = 0;
-  let totalAttemptedCircles = 0;
+  // let successfullyPlacedCircles = 0;
+  // let totalAttemptedCircles = 0;
 
   // VALUTO i fiumi contenuti nel continente che sto analizzando
   let rivers = [];
@@ -173,7 +175,7 @@ function drawRivers(centerX, centerY, maxRadius, continent) {
   for (let i = 0; i < rivers.length; i++) {
     let length = rivers[i].length;
     let riverSize = map(length, minLength, maxLength, minRiverSize, maxRiverSize);
-    totalAttemptedCircles++;
+    // totalAttemptedCircles++;
 
     let attempts = 0;
     let maxAttempts = nRivers * 10;
@@ -200,20 +202,15 @@ function drawRivers(centerX, centerY, maxRadius, continent) {
         circle(x, y, riverSize);
 
         placed = true;
-        successfullyPlacedCircles++;
+        // successfullyPlacedCircles++;
       }
       attempts++;
     }
-
+  // log per verifica 
     if (!placed) {
       console.warn(`fallito di inserire ${rivers[i].name} in ${continent} dopo ${maxAttempts} attempts`);
     }
   }
-
-  // log per verifica 
-  // console.log(`${continent} STATISTICS:`);
-  // console.log(`Failed placements: ${totalAttemptedCircles - successfullyPlacedCircles}`);
-  // console.log(`Placement success rate: ${(successfullyPlacedCircles / totalAttemptedCircles * 100).toFixed(2)}%`);
 }
 
 // MOUSE OVER -- https://openprocessing.org/sketch/1028248/ reference code
@@ -252,7 +249,7 @@ function getColorByTemperature(temperature) {
 }
 
 // LEGENDA
-function drawLegend() {
+function legenda() {
   let legendX = width / 2;
   let legendY = height - height / 9;
   let paddingY = 20 * scaleFactor;

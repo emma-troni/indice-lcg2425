@@ -9,6 +9,7 @@ let minLength;
 let minTemp;
 let maxTemp;
 let scaleFactor;
+let riverCircles = []; // array per memorizzare le informazioni dei fiumi
 let continents = ["Africa", "Asia", "Australia", "Europe", "North America", "Oceania", "South America"];
 let paddingContinentName = 15;
 let distContinentsFactor = 3.5;
@@ -25,8 +26,12 @@ function preload() {
   riversData = loadTable("data/rivers.csv", "csv", "header");
 }
 
+let infoLayer; // Layer per le informazioni
+let selectedRiver = null;
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  // Crea il layer per le informazioni
+  infoLayer = createGraphics(windowWidth, windowHeight);
   noLoop();
   table = riversData.getObject();
   nRivers = riversData.getRowCount();
@@ -67,6 +72,9 @@ function draw() {
   fill(txtColor);
   text("Rivers in the World", width / 2, 30);
   pop()
+  // Reset riverCircles array all'inizio di ogni draw
+  riverCircles = [];
+
   scaleFactor = min(windowWidth, windowHeight) / 1000;
   // CONTINENTI e FIUMI
   let distContinents = min(windowWidth, windowHeight) / distContinentsFactor;
@@ -78,7 +86,10 @@ function draw() {
     let y = positions[i][1];
     drawContinent(x, y, continent);
   }
-  drawLegend()
+  drawLegend();
+
+  // Disegna il layer delle informazioni sopra tutto
+  image(infoLayer, 0, 0);
 }
 
 
@@ -123,6 +134,7 @@ function continentSize(continent) {
       riversPerContinent.push(table[i]);
     }
   }
+  
   // CIRCLE PACKING THEORY
   // https://mathworld.wolfram.com/CirclePacking.html, https://en.wikipedia.org/wiki/Circle_packing 
   // a causa della natura casuale del posizionamento dei fiumi all'interno del cerchio dei continenti
@@ -186,11 +198,21 @@ function drawRivers(centerX, centerY, maxRadius, continent) {
       let y = centerY + sin(angle) * distance;
 
       if (!isOverlapping(x, y, riverSize / 2, placedCircles)) {
+        // Aggiungi il fiume all'array dei cerchi posizionati
         placedCircles.push({
           x: x,
           y: y,
+          r: riverSize / 2
+        });
+
+        // Aggiungi il fiume all'array globale con tutte le informazioni
+        riverCircles.push({
+          x: x,
+          y: y,
           r: riverSize / 2,
-          river: rivers[i].name,
+          name: rivers[i].name,
+          length: rivers[i].length,
+          temp: rivers[i].min_temp,
           continent: continent
         });
 
@@ -216,10 +238,66 @@ function drawRivers(centerX, centerY, maxRadius, continent) {
   // console.log(`Placement success rate: ${(successfullyPlacedCircles / totalAttemptedCircles * 100).toFixed(2)}%`);
 }
 
-// MOUSE OVER -- https://openprocessing.org/sketch/1028248/ reference code
-function mouseIsHovered(x, y, radius) {
-  return dist(mouseX, mouseY, x, y) < radius;
+// Funzione per gestire il click del mouse
+function mousePressed() {
+  let clicked = false;
+  
+  for (let circle of riverCircles) {
+    if (dist(mouseX, mouseY, circle.x, circle.y) < circle.r) {
+      clicked = true;
+      
+      // Se clicco lo stesso fiume, lo deseleziono
+      if (selectedRiver === circle) {
+        selectedRiver = null;
+        infoLayer.clear();
+      } else {
+        // Altrimenti seleziono il nuovo fiume
+        selectedRiver = circle;
+        
+        // Pulisci il layer delle informazioni
+        infoLayer.clear();
+        
+        // Disegna le informazioni sul layer separato
+        infoLayer.push();
+        infoLayer.fill(txtColor);
+        infoLayer.noStroke();
+        infoLayer.textSize(14);
+        infoLayer.textAlign(CENTER);
+        
+        // Crea il testo informativo
+        let info = `${circle.name}\nLength: ${circle.length}km\nTemp: ${circle.temp}°C`;
+        
+        // Calcola l'altezza del box informativo
+        let lines = info.split('\n');
+        let boxHeight = lines.length * 20;
+        
+        // Posizione del testo sopra il cerchio
+        let textY = circle.y - circle.r - boxHeight - 10;
+        
+        // Disegna un rettangolo semi-trasparente dietro il testo
+        infoLayer.fill(0, 0, 0, 200);
+        infoLayer.rect(circle.x - 100, textY - 10, 200, boxHeight + 20, 5);
+        
+        // Disegna il testo
+        infoLayer.fill(txtColor);
+        infoLayer.text(info, circle.x, textY + boxHeight/2);
+        infoLayer.pop();
+      }
+      
+      break;
+    }
+  }
+  
+  if (!clicked) {
+    selectedRiver = null;
+    infoLayer.clear();
+  }
+  
+  // Aggiorna solo il layer delle informazioni
+  image(infoLayer, 0, 0);
 }
+
+
 
 // VERIFICA se un nuovo cerchio si sovrappone a uno degli altri cerchi già esistenti. 
 function isOverlapping(x, y, radius, circles) {
@@ -312,13 +390,16 @@ function drawLegend() {
 }
 
 // RESIZE 
+// Aggiungi questa funzione per gestire il ridimensionamento della finestra
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  // Ridimensiona anche il layer delle informazioni
+  infoLayer.resizeCanvas(windowWidth, windowHeight);
   if (windowWidth > 1100) {
     distContinentsFactor = 3.5;
   } else if (700 < windowWidth < 1100) {
     distContinentsFactor = 4;
-  } else if (600<windowWidth < 700) {
+  } else if (600 < windowWidth < 700) {
     distContinentsFactor = 11;
   }
   redraw();
