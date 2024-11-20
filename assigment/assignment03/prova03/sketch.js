@@ -5,7 +5,6 @@
 //    It displays values of leaf nodes of a hierarchical structure by using circles areas: continent, name
 //    The hierarchical structure is depicted using nested circles. 
 //    A further quantitative dimension with size and a quantitative or categorical dimension (lenght) with color (avg_temp).
-
 // var globali
 let riversData;
 let table;
@@ -61,6 +60,8 @@ function setup() {
       maxTemp = tempValue;
     }
   }
+  // console.log(minTemp)
+  // console.log(maxTemp)
 }
 
 function draw() {
@@ -119,7 +120,7 @@ function drawContinent(x, y, continent) {
   fill(txtColor);
   textSize(14);
   textAlign(CENTER, CENTER);
-  text(continent, x, y - textOffsetY); 
+  text(continent, x, y - textOffsetY); // Posiziona il testo sopra il cerchio
 
 }
 
@@ -164,6 +165,10 @@ function continentSize(continent) {
 
 // FIUMI
 function drawRivers(centerX, centerY, maxRadius, continent) {
+  // counter per i cerchi effettivamente disegnati
+  // let successfullyPlacedCircles = 0;
+  // let totalAttemptedCircles = 0;
+
   // VALUTO i fiumi contenuti nel continente che sto analizzando
   let rivers = [];
   for (let i = 0; i < nRivers; i++) {
@@ -171,11 +176,13 @@ function drawRivers(centerX, centerY, maxRadius, continent) {
       rivers.push(table[i]);
     }
   }
+  // console.log(`Cerco di disengare ${rivers.length} fiumi per ${continent}`);
   // DISEGNO i cerchi dei fiumi
   let placedCircles = [];
   for (let i = 0; i < rivers.length; i++) {
     let length = rivers[i].length;
     let riverSize = map(length, minLength, maxLength, minRiverSize, maxRiverSize);
+    // totalAttemptedCircles++;
 
     let attempts = 0;
     let maxAttempts = nRivers * 10;
@@ -202,6 +209,7 @@ function drawRivers(centerX, centerY, maxRadius, continent) {
         circle(x, y, riverSize);
 
         placed = true;
+        // successfullyPlacedCircles++;
       }
       attempts++;
     }
@@ -210,6 +218,11 @@ function drawRivers(centerX, centerY, maxRadius, continent) {
       console.warn(`fallito di inserire ${rivers[i].name} in ${continent} dopo ${maxAttempts} attempts`);
     }
   }
+}
+
+// MOUSE OVER -- https://openprocessing.org/sketch/1028248/ reference code
+function mouseIsHovered(x, y, radius) {
+  return dist(mouseX, mouseY, x, y) < radius;
 }
 
 // VERIFICA se un nuovo cerchio si sovrappone a uno degli altri cerchi già esistenti. 
@@ -231,6 +244,7 @@ function isOverlapping(x, y, radius, circles) {
 // COLORE FIUMI
 function getColorByTemperature(temperature) {
   // proporzione: brightness = (temperature - minTemp)/(maxTemp-MinTemp)
+
   let brightness = map(temperature, minTemp, maxTemp, 0, 1);
   // lerp(a,b,t) --> https://p5js.org/reference/p5/lerp/ 
   // calcola un valore tra due numeri (a,b) dato uno specifico incremento (t)

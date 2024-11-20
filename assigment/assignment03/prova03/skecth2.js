@@ -1,17 +1,76 @@
+
+// DA FARE
+// mappare area non lunghezza
+// eliminare liste inutili
+// spostare legenda a sx: nome fiume, temperatura, lunghezza
+
+
 // var globali
 let riversData;
 let table;
 let nRivers;
-let minRiverSize = 1;
-let maxRiverSize = 30;
-let maxLength;
-let minLength;
+let minRiverSize = 2;
+let maxRiverSize = 50;
+let maxArea;
+let minArea;
 let minTemp;
 let maxTemp;
 let scaleFactor;
 let continents = ["Africa", "Asia", "Australia", "Europe", "North America", "Oceania", "South America"];
 let paddingContinentName = 15;
 let distContinentsFactor = 3.5;
+let yHeader = 30;
+// Calculate 
+// continents.length, width / 2, height / 2 - height / 20, distContinents
+let continentX;
+let continentY;
+let distContinents;
+let continentPosition;
+let continentData = []; // info di OGNI continente con i suoi fiumi
+/*
+continentData = [
+    {
+        name: "Africa",      
+        x: position[0],      
+        y: position[1],      
+        radius: continentRadius,  
+        rivers: riverPositions   
+    },
+    ...
+]
+*/
+let riverData = []; //info di UN SINGOLO fiume
+/*
+riverData = {
+    x: xRiver,          
+    y: yRiver,           
+    r: riverSize / 2,    
+    size: riverSize,     
+    river: river.name,   
+    continent: continent, 
+    color: getColorByTemperature(river.min_temp) 
+}
+*/
+
+let riverPositions = []; //info di N fiumi del SINGOLO continente 
+/*
+riverPositions = [
+    {riverData del I fiume},
+    {riverData del II fiume },
+    ...     
+    {riverData del N fiume }
+  ]
+*/
+let placedContinents = []; // info di TUTTI i fiumi di TUTTI i continenti per controllo di sovrapposizioni
+/*
+placedContinents = [
+ { riverData del I fiume del I continente },
+ { riverData del II fiume del I continente },
+ { riverData del I fiume del II continente },
+  ...
+] 
+*/
+let selectedRiver = null;
 
 // COLORI 
 let continentColor = "grey";
@@ -20,30 +79,107 @@ let txtColor = "white";
 let tempColor = [[218, 225, 250], [23, 92, 230]];
 //              [[ minTemp rgb ],[ maxTemp rgb ]]
 
-
+// blocco di codice da eseguire automaticamente una volta prima di setup() o draw()
 function preload() {
   riversData = loadTable("data/rivers.csv", "csv", "header");
 }
 
+function calculate() {
+  continentX = width / 2;
+  continentY = height-height/2.5;
+  scaleFactor = min(windowWidth, windowHeight) / 1000;
+  distContinents = min(windowWidth, windowHeight) / distContinentsFactor;
+
+  // POSIZIONE CONTINENT 
+  continentPositions = findPositionContinent(continents.length,continentX, continentY, distContinents);
+
+  placedContinents = [];
+  continentData = [];
+  
+  for (let i = 0; i < continents.length; i++) {
+    let continent = continents[i];
+    let position = continentPositions[i];
+    let continentRadius = continentSize(continent);
+
+    // fiumi per il i-esimo continente
+    let continentRivers = [];
+    for (let j = 0; j < nRivers; j++) {
+      if (table[j].continent === continent) {
+        continentRivers.push(table[j]);
+      }
+    }
+
+    // posizioni fiumi per i-esimo continente
+    riverPositions = [];
+    for (let j = 0; j < continentRivers.length; j++) {
+      let river = continentRivers[j];
+      let area = river.area;
+      let riverSize = map(area, minArea, maxArea, minRiverSize, maxRiverSize);
+
+      let attempts = 0;
+      let maxAttempts = nRivers * 10;
+      let placed = false;
+      // CIRCLE PACKING --> gestione disposizione interna dei fiumi
+      // tutorial: https://openprocessing.org/sketch/1138749/
+      // controllo che i fiumi non si posizionino uno sopra l'altro
+      while (!placed && attempts < maxAttempts) {
+        let angle = random(0, TWO_PI);
+        let distance = random(0, continentRadius - riverSize / 2);
+        let xRiver = position[0] + cos(angle) * distance;
+        let yRiver = position[1] + sin(angle) * distance;
+
+        if (!isOverlapping(xRiver, yRiver, riverSize / 2, placedContinents)) {
+          riverData = {
+            x: xRiver,
+            y: yRiver,
+            r: riverSize / 2,
+            size: riverSize,
+            river: river.name,
+            continent: continent,
+            temp: river.min_temp,
+            color: getColorByTemperature(river.min_temp)
+          };
+
+          riverPositions.push(riverData);
+          placedContinents.push(riverData);
+          placed = true;
+        }
+        attempts++;
+      }
+
+      if (!placed) {
+        console.warn(`Failed to place ${river.name} in ${continent} after ${maxAttempts} attempts`);
+      }
+    }
+
+    // salvo tutti i dati calcolati per poi usarli nella draw
+    continentData.push({
+      name: continent,
+      x: position[0],
+      y: position[1],
+      radius: continentRadius,
+      rivers: riverPositions
+    });
+  }
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  noLoop();
-
   table = riversData.getObject();
   nRivers = riversData.getRowCount();
 
-  // min max lenght/min_temp:
-  minLength = Number(table[0].length);
-  maxLength = Number(table[0].length);
+  // min e max length/min_temp:
+  minArea = Number(table[0].area);
+  maxArea = Number(table[0].area);
   minTemp = Number(table[0].min_temp);
   maxTemp = Number(table[0].min_temp);
   for (let i = 1; i < nRivers; i++) {
-    let lengthValue = Number(table[i].length);
-    if (lengthValue < minLength) {
-      minLength = lengthValue;
+    let lengthValue = Number(table[i].area);
+    if (lengthValue < minArea) {
+      minArea = lengthValue;
     }
-    if (lengthValue > maxLength) {
-      maxLength = lengthValue;
+    if (lengthValue > maxArea) {
+      maxArea = lengthValue;
     }
     let tempValue = Number(table[i].min_temp);
     if (tempValue < minTemp) {
@@ -53,68 +189,36 @@ function setup() {
       maxTemp = tempValue;
     }
   }
-  // console.log(minTemp)
-  // console.log(maxTemp)
+  console.log(minArea)
+  console.log(maxArea)
+  calculate();
 }
 
-function draw() {
-  background(bgColor);
-  // HEADER
-  textSize(20);
-  textAlign(CENTER, TOP);
-  push()
-  textStyle(BOLD);
-  fill(txtColor);
-  text("Rivers in the World", width / 2, 30);
-  pop()
+// POSIZIONE CONTINENTI 
+function findPositionContinent(nContinents, centerContentX, centerContentY, distContinents) {
+  let continentPositions = [];
+  if ((windowWidth < 800) && (windowHeight < 550)) {
+    // disposizione orizzontale
+    let totalWidth = nContinents * distContinents;
+    let startX = (windowWidth - totalWidth) / 2;
+    // let startY = (windowHeight)/8; s
 
-  scaleFactor = min(windowWidth, windowHeight) / 1000;
-
-  // CONTINENTI e FIUMI
-  let distContinents = min(windowWidth, windowHeight) / distContinentsFactor;
-  let positions = continentPos(continents.length, width / 2, height / 2 - height / 20, distContinents);
-  // disegno ogni continente con i fiumi interni
-  for (let i = 0; i < continents.length; i++) {
-    let continent = continents[i];
-    let x = positions[i][0];
-    let y = positions[i][1];
-    drawContinent(x, y, continent);
+    for (let i = 0; i < nContinents; i++) {
+      let x = (i * distContinents) - startX;
+      let y = centerContentY;
+      continentPositions.push([x, y]);
+    }
+  } else {
+    // disposizione a raggera per width > 800
+    let angleStep = TWO_PI / nContinents;
+    for (let i = 0; i < nContinents; i++) {
+      let angle = i * angleStep;
+      let x = centerContentX + cos(angle) * distContinents;
+      let y = centerContentY + sin(angle) * distContinents;
+      continentPositions.push([x, y]);
+    }
   }
-  legenda()
-}
-
-
-// POSIZIONO CONTINENTI ogni cerchio equidistante ad esso lungo una circonferenza
-function continentPos(num, centerContentX, centerContentY, distContinents) {
-  let positions = [];
-  let angleStep = TWO_PI / num;
-  for (let i = 0; i < num; i++) {
-    let angle = i * angleStep;
-    let x = centerContentX + cos(angle) * distContinents;
-    let y = centerContentY + sin(angle) * distContinents;
-    positions.push([x, y]);
-  }
-  return positions;
-}
-
-// CONTINENTI
-function drawContinent(x, y, continent) {
-  // valuto la dimensione del cerchio a seconda del n di fiumi presenti:
-  let radius = continentSize(continent);
-  noFill();
-  stroke(continentColor);
-  strokeWeight(2);
-  circle(x, y, radius * 2);
-  // DISEGNO FIUMI INTERNI AI CONTINENTI
-  drawRivers(x, y, radius, continent);
-
-  // NOME del continente sopra il cerchio
-  let textOffsetY = radius + paddingContinentName;
-  fill(txtColor);
-  textSize(14);
-  textAlign(CENTER, CENTER);
-  text(continent, x, y - textOffsetY); 
-
+  return continentPositions;
 }
 
 // DIM CONTINENTE proporzionale al n di fiumi al suo interno
@@ -136,9 +240,9 @@ function continentSize(continent) {
   // calcolo l'area TEORICA necessaria 
   let theoryArea = 0;
   for (let i = 0; i < riversPerContinent.length; i++) {
-    let numRivers = riversPerContinent[i].length;
-    // proporzione dimensione cerchio rispetto alla dimensione relativa a Lenght di ciascun fiume
-    let riverSize = map(numRivers, minLength, maxLength, minRiverSize, maxRiverSize);
+    // let numRivers = riversPerContinent[i].length;
+    // proporzione dimensione cerchio rispetto alla dimensione relativa a Length di ciascun fiume
+    let riverSize = map(riversPerContinent[i].area, minArea, maxArea, minRiverSize, maxRiverSize);
     // area = PI*(raggio**2)
     theoryArea += PI * (riverSize / 2) ** 2;
   }
@@ -149,73 +253,11 @@ function continentSize(continent) {
   // 1. inefficienza del circle packing (circa 10% = C appollonio)
   // 2. spazio extra per facilitare il posizionamento
   let packingInefficiencyFactor = 1.1;
-  let extraPadding = 20;
+  let extraPadding = 15;
 
   let finalRadius = (theoryRadius * packingInefficiencyFactor) + extraPadding;
 
   return finalRadius;
-}
-
-// FIUMI
-function drawRivers(centerX, centerY, maxRadius, continent) {
-  // counter per i cerchi effettivamente disegnati
-  // let successfullyPlacedCircles = 0;
-  // let totalAttemptedCircles = 0;
-
-  // VALUTO i fiumi contenuti nel continente che sto analizzando
-  let rivers = [];
-  for (let i = 0; i < nRivers; i++) {
-    if (table[i].continent === continent) {
-      rivers.push(table[i]);
-    }
-  }
-  // console.log(`Cerco di disengare ${rivers.length} fiumi per ${continent}`);
-  // DISEGNO i cerchi dei fiumi
-  let placedCircles = [];
-  for (let i = 0; i < rivers.length; i++) {
-    let length = rivers[i].length;
-    let riverSize = map(length, minLength, maxLength, minRiverSize, maxRiverSize);
-    // totalAttemptedCircles++;
-
-    let attempts = 0;
-    let maxAttempts = nRivers * 10;
-    let placed = false;
-
-    while (!placed && attempts < maxAttempts) {
-      let angle = random(0, TWO_PI);
-      let distance = random(0, maxRadius - riverSize / 2);
-      let x = centerX + cos(angle) * distance;
-      let y = centerY + sin(angle) * distance;
-
-      if (!isOverlapping(x, y, riverSize / 2, placedCircles)) {
-        placedCircles.push({
-          x: x,
-          y: y,
-          r: riverSize / 2,
-          river: rivers[i].name,
-          continent: continent
-        });
-
-        let riverColor = getColorByTemperature(rivers[i].min_temp);
-        fill(riverColor);
-        noStroke();
-        circle(x, y, riverSize);
-
-        placed = true;
-        // successfullyPlacedCircles++;
-      }
-      attempts++;
-    }
-  // log per verifica 
-    if (!placed) {
-      console.warn(`fallito di inserire ${rivers[i].name} in ${continent} dopo ${maxAttempts} attempts`);
-    }
-  }
-}
-
-// MOUSE OVER -- https://openprocessing.org/sketch/1028248/ reference code
-function mouseIsHovered(x, y, radius) {
-  return dist(mouseX, mouseY, x, y) < radius;
 }
 
 // VERIFICA se un nuovo cerchio si sovrappone a uno degli altri cerchi già esistenti. 
@@ -237,8 +279,8 @@ function isOverlapping(x, y, radius, circles) {
 // COLORE FIUMI
 function getColorByTemperature(temperature) {
   // proporzione: brightness = (temperature - minTemp)/(maxTemp-MinTemp)
-  // valori vicini a minTemp: brightness -->0
-  // valori vicini a maxTemp: brightness -->1
+  // valori vicini a minTemp: brightness --> 0
+  // valori vicini a maxTemp: brightness --> 1
   let brightness = map(temperature, minTemp, maxTemp, 0, 1);
   // lerp(a,b,t) --> https://p5js.org/reference/p5/lerp/ 
   // calcola un valore tra due numeri (a,b) dato uno specifico incremento (t)
@@ -248,30 +290,92 @@ function getColorByTemperature(temperature) {
   return color(r, g, b);
 }
 
+function draw() {
+  background(bgColor);
+
+  // header
+  textSize(25);
+  textAlign(CENTER, TOP);
+  push();
+  textStyle(BOLD);
+  fill(txtColor);
+  text("Rivers in the World", width / 2, yHeader);
+  pop();
+
+  legenda();
+
+  // continents e 
+  for (let continent of continentData) {
+    // disegno continent 
+    noFill();
+    stroke(continentColor);
+    strokeWeight(2);
+    circle(continent.x, continent.y, continent.radius * 2);
+
+    // nome continente
+    noStroke();
+    let textOffsetY = continent.radius + paddingContinentName;
+    fill(txtColor);
+    textSize(14);
+    textAlign(CENTER, CENTER);
+    text(continent.name, continent.x, continent.y - textOffsetY);
+
+    // Draw rivers
+    for (let river of continent.rivers) {
+      fill(river.color);
+      if (selectedRiver === river) {
+        fill("white")
+      }
+      circle(river.x, river.y, river.size);
+    }
+  }
+}
+
+// MOUSE OVER 
+// https://openprocessing.org/sketch/1028248/ reference code
+function mouseIsHovered(x, y, radius) {
+  return dist(mouseX, mouseY, x, y) < radius;
+}
+
+function mouseMoved() {
+  for (const river of placedContinents) {
+    if (mouseIsHovered(river.x, river.y, river.r)) {
+      selectedRiver = river;
+      return;
+    }
+  }
+  selectedRiver = null;
+}
+
 // LEGENDA
 function legenda() {
   let legendX = width / 2;
-  let legendY = height - height / 9;
+  let legendY = yHeader * 4;
   let paddingY = 20 * scaleFactor;
   let paddingX = 100 * scaleFactor;
   let gradWidth = 130 * scaleFactor;
   let gradHeight = 10 * scaleFactor;
 
   push();
+  noStroke();
   translate(legendX, legendY);
-
+  
   // titolo legenda
   fill(txtColor);
   textSize(16 * scaleFactor);
   textStyle(BOLD)
   textAlign(CENTER, TOP);
   text("Legenda", 0, -paddingY * 2);
+  if (selectedRiver != null) {
 
-  // TEMPERATURA
-  // LINEAR GRADIENT
-  // video tutorial https://www.youtube.com/watch?v=-MUOweQ6wac
+    text(selectedRiver.river, 0, -paddingY * 2);
+  } else {
+    text("   ")
+  }
+
+  // temperatura 
+  // LINEAR GRADIENT - tutorial https://www.youtube.com/watch?v=-MUOweQ6wac
   // reference code: https://github.com/Creativeguru97/YouTube_tutorial/blob/master/p5_hacks/Gradient_effect/linear_gradient/sketch.js 
-  noStroke();
   let gradX1 = -paddingX * 2;  // Posizione del gradiente
   let gradY1 = paddingY;  // Altezza relativa
   let gradX2 = gradX1 + gradWidth;
@@ -280,43 +384,41 @@ function legenda() {
   textStyle(NORMAL)
   textAlign(LEFT, CENTER);
   text("Minimum Temperature Range", -paddingX * 2.4, 0);
+
   let gradient = drawingContext.createLinearGradient(gradX1, gradY1, gradX2, gradY2);
   gradient.addColorStop(0, getColorByTemperature(minTemp));
   gradient.addColorStop(1, getColorByTemperature(maxTemp));
-
   drawingContext.fillStyle = gradient;
   rect(gradX1, gradY1, gradWidth, gradHeight);
+  if (selectedRiver != null) {
+    let markX = map(selectedRiver.temp, minTemp, maxTemp, gradX1, gradX1 + gradWidth)
+    fill("red")
+    rect(markX, gradY1, 3, gradHeight)
+  }
 
   fill(txtColor);
   textAlign(CENTER, CENTER);
   text(minTemp + "°C", gradX1 - 20 * scaleFactor, gradY1 + gradHeight / 2);
   text(maxTemp + "°C", gradX2 + 20 * scaleFactor, gradY1 + gradHeight / 2);
 
-  //LUNGHEZZA
+  // LENGTH
   textAlign(LEFT, CENTER);
   let riversX = paddingX * 1.2;
-  text("River Length", riversX, 0);
+
+  text(`River Length ()`, riversX, 0);
   // Cerchi di dimensioni rappresentative
   fill(txtColor);
-  circle(riversX + 30 * scaleFactor, paddingY, minRiverSize * scaleFactor);
-  circle(riversX + 30 * scaleFactor, paddingY + 45 * scaleFactor, maxRiverSize * scaleFactor);
+  circle(riversX + 30 * scaleFactor, paddingY, minRiverSize );
+  circle(riversX + 30 * scaleFactor, paddingY + 45 * scaleFactor, maxRiverSize );
 
   textAlign(LEFT, CENTER);
-  text("Min Length", riversX + 80 * scaleFactor, paddingY);
+  text('Min Length: ' + minArea, riversX + 80 * scaleFactor, paddingY);
   text("Max Length", riversX + 80 * scaleFactor, paddingY + 45 * scaleFactor);
-
   pop();
+
 }
 
-// RESIZE 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  if (windowWidth > 1100) {
-    distContinentsFactor = 3.5;
-  } else if (700 < windowWidth < 1100) {
-    distContinentsFactor = 4;
-  } else if (600<windowWidth < 700) {
-    distContinentsFactor = 11;
-  }
-  redraw();
+  calculate();
 }
