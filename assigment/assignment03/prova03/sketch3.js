@@ -262,7 +262,7 @@ function draw() {
   textStyle(NORMAL);
   textSize(15);
   fill(txtColor[1])
-  text("Hover over the smaller circles within each continent to explore river details", width / 2, yHeader+30)
+  text("Passa il cursore sui cerchi nel continente per esplorare i dettagli di ogni fiume", width / 2, yHeader+30)
   pop();
 
   for (let continent of continentData) {
